@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="th">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f3eb">
+  <meta name="description" content="ค้นหานักษัตรจีนจากวันเกิด โดยคำนวณตามปฏิทินจันทรคติจีน">
+  <title>นักษัตรของฉัน — ค้นหาปีนักษัตรจีน</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #26332e;
+      --muted: #748078;
+      --paper: #f6f3eb;
+      --card: #fffefa;
+      --green: #355d4d;
+      --green-dark: #254537;
+      --line: #e8e5db;
+      --gold: #c99d54;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 85% 4%, rgba(201, 157, 84, .12), transparent 28rem),
+        var(--paper);
+      color: var(--ink);
+      font-family: "Noto Sans Thai", "Leelawadee UI", Tahoma, sans-serif;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      width: min(100% - 40px, 1080px);
+      margin: 0 auto;
+      padding: 28px 0 42px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 66px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--green-dark);
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: .01em;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border: 1px solid rgba(53, 93, 77, .2);
+      border-radius: 50%;
+      color: var(--green);
+      font-size: 19px;
+    }
+
+    .top-note {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .intro {
+      max-width: 690px;
+      margin: 0 auto 34px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 15px;
+      color: #94703c;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .09em;
+    }
+
+    .eyebrow::before,
+    .eyebrow::after {
+      width: 22px;
+      height: 1px;
+      background: var(--gold);
+      content: "";
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--green-dark);
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -.04em;
+      line-height: 1.3;
+    }
+
+    .intro p {
+      margin: 12px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.8;
+    }
+
+    .calculator {
+      width: min(100%, 560px);
+      margin: 0 auto;
+      padding: 28px;
+      border: 1px solid rgba(53, 93, 77, .09);
+      border-radius: 22px;
+      background: var(--card);
+      box-shadow: 0 18px 55px rgba(48, 57, 48, .08);
+    }
+
+    .field-label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="date"] {
+      width: 100%;
+      min-width: 0;
+      min-height: 52px;
+      padding: 0 14px;
+      border: 1px solid #dcded5;
+      border-radius: 11px;
+      outline: none;
+      background: #fff;
+      color: var(--ink);
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    input[type="date"]:focus {
+      border-color: var(--green);
+      box-shadow: 0 0 0 3px rgba(53, 93, 77, .12);
+    }
+
+    button {
+      flex: 0 0 auto;
+      min-height: 52px;
+      padding: 0 22px;
+      border: 0;
+      border-radius: 11px;
+      background: var(--green);
+      color: #fff;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 700;
+      transition: background .2s, transform .2s;
+    }
+
+    button:hover {
+      background: var(--green-dark);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button:focus-visible {
+      outline: 3px solid rgba(53, 93, 77, .35);
+      outline-offset: 3px;
+    }
+
+    .hint {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .result {
+      margin-top: 20px;
+      padding: 22px;
+      border: 1px solid #e8e3d6;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #f8f6ef, #fffdf7);
+      text-align: center;
+    }
+
+    .result[hidden],
+    .message[hidden] {
+      display: none;
+    }
+
+    .result-kicker {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .animal-icon {
+      display: grid;
+      width: 76px;
+      height: 76px;
+      margin: 12px auto 8px;
+      place-items: center;
+      border: 1px solid rgba(201, 157, 84, .35);
+      border-radius: 50%;
+      background: #fffaf0;
+      font-size: 43px;
+      line-height: 1;
+    }
+
+    .result h2 {
+      margin: 0;
+      color: var(--green-dark);
+      font-size: 25px;
+    }
+
+    .result-year {
+      margin: 4px 0 0;
+      color: #96723f;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .message {
+      margin: 14px 0 0;
+      color: #a13d32;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .zodiac-section {
+      margin: 57px auto 0;
+      text-align: center;
+    }
+
+    .zodiac-section h2 {
+      margin: 0;
+      color: var(--green-dark);
+      font-size: 20px;
+    }
+
+    .zodiac-section>p {
+      margin: 7px 0 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .zodiac-list {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .zodiac-item {
+      padding: 14px 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: rgba(255, 254, 250, .75);
+    }
+
+    .zodiac-item span {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 25px;
+    }
+
+    .zodiac-item strong {
+      color: #536057;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    footer {
+      margin-top: 32px;
+      color: #899189;
+      font-size: 11px;
+      line-height: 1.8;
+      text-align: center;
+    }
+
+    @media (max-width: 620px) {
+      .page {
+        width: min(100% - 28px, 500px);
+        padding-top: 18px;
+      }
+
+      .topbar {
+        margin-bottom: 48px;
+      }
+
+      .top-note {
+        display: none;
+      }
+
+      .calculator {
+        padding: 20px;
+      }
+
+      .input-row {
+        flex-direction: column;
+      }
+
+      button {
+        width: 100%;
+      }
+
+      .zodiac-section {
+        margin-top: 45px;
+      }
+
+      .zodiac-list {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .zodiac-item {
+        padding: 11px 5px 9px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="page">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="นักษัตรของฉัน หน้าหลัก">
+        <span class="brand-mark" aria-hidden="true">東</span>
+        <span>นักษัตรของฉัน</span>
+      </a>
+      <span class="top-note">เรื่องราวจากปฏิทินจีน</span>
+    </header>
+
+    <section class="intro" aria-labelledby="page-title">
+      <span class="eyebrow">CHINESE ZODIAC</span>
+      <h1 id="page-title">คุณเกิดปีนักษัตรอะไร?</h1>
+      <p>ใส่วันเกิดของคุณ แล้วมาค้นหาสัตว์ประจำปีเกิด<br>ตามปฏิทินจันทรคติจีนทั้ง 12 นักษัตร</p>
+    </section>
+
+    <section class="calculator" aria-label="เครื่องคำนวณนักษัตรจีน">
+      <form id="zodiac-form" novalidate>
+        <label class="field-label" for="birth-date">วัน / เดือน / ปีเกิด</label>
+        <div class="input-row">
+          <input id="birth-date" name="birth-date" type="date" required aria-describedby="date-hint">
+          <button type="submit">ค้นหานักษัตร</button>
+        </div>
+        <p class="hint" id="date-hint">ใช้วันเกิดจริงเพื่อความแม่นยำ โดยเฉพาะผู้ที่เกิดช่วงเดือนมกราคม–กุมภาพันธ์</p>
+      </form>
+
+      <p class="message" id="message" role="alert" hidden></p>
+
+      <section class="result" id="result" aria-live="polite" hidden>
+        <div class="result-kicker">นักษัตรจีนของคุณคือ</div>
+        <div class="animal-icon" id="animal-icon" aria-hidden="true"></div>
+        <h2 id="animal-name"></h2>
+        <p class="result-year" id="result-year"></p>
+      </section>
+    </section>
+
+    <section class="zodiac-section" aria-labelledby="zodiac-title">
+      <h2 id="zodiac-title">12 นักษัตรจีน</h2>
+      <p>วนเวียนเปลี่ยนไปทุกปี ตามรอบนักษัตร</p>
+      <div class="zodiac-list">
+        <div class="zodiac-item"><span aria-hidden="true">🐀</span><strong>ชวด · หนู</strong></div>
+        <div class="zodiac-item"><span aria-hidden="true">🐂</span><strong>ฉลู · วัว</strong></div>
+        <div class="zodiac-item"><span aria-hidden="true">🐅</span><strong>ขาล · เสือ</strong></div>
+        <div class="zodiac-item"><span aria-hidden="true">🐇</span><strong>เถาะ · กระต่าย</strong></div>
+        <div class="zodiac-item"><span aria-hidden="true">🐉</span><strong>มะโรง · มังกร</strong></div>
+        <div class="zodiac-item"><span aria-hidden="true">🐍</span><strong>มะเส็ง · งู</strong></div>
+        <div class="zodiac-item"><span aria-hidden="true">🐎</span><strong>มะเมีย · ม้า</strong></div>
+        <div class="zodiac-item"><span aria-hidden="true">🐐</span><strong>มะแม · แพะ</strong></div>
+        <div class="zodiac-item"><span aria-hidden="true">🐒</span><strong>วอก · ลิง</strong></div>
+        <div class="zodiac-item"><span aria-hidden="true">🐓</span><strong>ระกา · ไก่</strong></div>
+        <div class="zodiac-item"><span aria-hidden="true">🐕</span><strong>จอ · สุนัข</strong></div>
+        <div class="zodiac-item"><span aria-hidden="true">🐖</span><strong>กุน · หมู</strong></div>
+      </div>
+    </section>
+
+    <footer>
+      การนับนักษัตรจีนอิงวันขึ้นปีใหม่ตามปฏิทินจันทรคติจีน ซึ่งไม่ตรงกับวันที่ 1 มกราคมเสมอไป<br>
+      ความเชื่อเรื่องนักษัตรเป็นวัฒนธรรมและความเชื่อส่วนบุคคล
+    </footer>
+  </main>
+
+  <script>
+    const animalsByBranch = {
+      zi: { name: "ปีชวด · หนู", icon: "🐀" },
+      chou: { name: "ปีฉลู · วัว", icon: "🐂" },
+      yin: { name: "ปีขาล · เสือ", icon: "🐅" },
+      mao: { name: "ปีเถาะ · กระต่าย", icon: "🐇" },
+      chen: { name: "ปีมะโรง · มังกร", icon: "🐉" },
+      si: { name: "ปีมะเส็ง · งู", icon: "🐍" },
+      wu: { name: "ปีมะเมีย · ม้า", icon: "🐎" },
+      wei: { name: "ปีมะแม · แพะ", icon: "🐐" },
+      shen: { name: "ปีวอก · ลิง", icon: "🐒" },
+      you: { name: "ปีระกา · ไก่", icon: "🐓" },
+      xu: { name: "ปีจอ · สุนัข", icon: "🐕" },
+      hai: { name: "ปีกุน · หมู", icon: "🐖" }
+    };
+
+    const form = document.querySelector("#zodiac-form");
+    const dateInput = document.querySelector("#birth-date");
+    const result = document.querySelector("#result");
+    const message = document.querySelector("#message");
+
+    function showMessage(text) {
+      message.textContent = text;
+      message.hidden = false;
+      result.hidden = true;
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      message.hidden = true;
+      result.hidden = true;
+
+      const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateInput.value);
+      if (!match) {
+        showMessage("กรุณาเลือกวันเกิดให้ครบถ้วน");
+        dateInput.focus();
+        return;
+      }
+
+      const [, yearText, monthText, dayText] = match;
+      const year = Number(yearText);
+      const month = Number(monthText);
+      const day = Number(dayText);
+      const date = new Date(Date.UTC(year, month - 1, day, 12));
+      if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) {
+        showMessage("วันที่ที่เลือกไม่ถูกต้อง กรุณาตรวจสอบอีกครั้ง");
+        dateInput.focus();
+        return;
+      }
+
+      try {
+        const parts = new Intl.DateTimeFormat("en-u-ca-chinese", {
+          year: "numeric",
+          timeZone: "UTC"
+        }).formatToParts(date);
+        const yearName = parts.find((part) => part.type === "yearName")?.value;
+        const relatedYear = parts.find((part) => part.type === "relatedYear")?.value;
+        const branch = yearName?.split("-").at(-1);
+        const animal = animalsByBranch[branch];
+
+        if (!animal || !relatedYear) {
+          showMessage("เบราว์เซอร์นี้ไม่รองรับปฏิทินจีน กรุณาลองเปิดด้วยเบราว์เซอร์เวอร์ชันใหม่");
+          return;
+        }
+
+        document.querySelector("#animal-icon").textContent = animal.icon;
+        document.querySelector("#animal-name").textContent = animal.name;
+        document.querySelector("#result-year").textContent = `ปีจีน ${relatedYear}`;
+        result.hidden = false;
+      } catch {
+        showMessage("ไม่สามารถคำนวณปฏิทินจีนได้ กรุณาลองเปิดด้วยเบราว์เซอร์เวอร์ชันใหม่");
+      }
+    });
+  </script>
+</body>
+
+</html>
